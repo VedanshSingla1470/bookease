@@ -5,6 +5,8 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./modules/auth/routes/auth.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
+import organizationRoutes from "./modules/organizations/routes/organization.routes.js";
+import membershipRoutes from "./modules/memberships/routes/membership.routes.js";
 
 const app = express();
 
@@ -33,6 +35,15 @@ const limiter = rateLimit({
 
 app.use("/api", limiter);
 app.use("/api/v1/auth", authRoutes);
+
+// Organization routes
+app.use("/api/v1/organizations", organizationRoutes);
+
+// Membership management routes
+app.use(
+  "/api/v1/organizations/:organizationId/members",
+  membershipRoutes
+);
 
 // Health check
 app.get("/api/v1/health", (req, res) => {
