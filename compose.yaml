@@ -13,10 +13,10 @@ services:
     env_file:
       - ./server/.env
     environment:
-      MONGODB_URI: mongodb://mongo:27017/bookease
+      MONGODB_URI: mongodb://mongo:27017/bookease?replicaSet=rs0
     depends_on:
-      mongo:
-        condition: service_healthy
+      mongo-init:
+        condition: service_completed_successfully
 
   frontend:
     image: node:22-alpine
@@ -34,15 +34,27 @@ services:
   mongo:
     image: mongo:8.0
     container_name: bookease-mongodb
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  mongo-init:
+    image: mongo:8.0
+    container_name: bookease-mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: ["mongosh", "--host", "mongo:27017", "--quiet", "--eval"]
+    command:
+      - "try { rs.status().ok } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongo:27017'}]}) }"
+    restart: "no"
 
 volumes:
   backend_node_modules:
