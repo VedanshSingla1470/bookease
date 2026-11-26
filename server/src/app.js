@@ -7,6 +7,7 @@ import authRoutes from "./modules/auth/routes/auth.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import organizationRoutes from "./modules/organizations/routes/organization.routes.js";
 import membershipRoutes from "./modules/memberships/routes/membership.routes.js";
+import serviceRoutes from "./modules/services/routes/service.routes.js";
 
 const app = express();
 
@@ -43,6 +44,11 @@ app.use("/api/v1/organizations", organizationRoutes);
 app.use(
   "/api/v1/organizations/:organizationId/members",
   membershipRoutes
+);
+
+app.use(
+  "/api/v1/organizations/:organizationId/services",
+  serviceRoutes
 );
 
 // Health check
