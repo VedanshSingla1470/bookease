@@ -8,6 +8,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import organizationRoutes from "./modules/organizations/routes/organization.routes.js";
 import membershipRoutes from "./modules/memberships/routes/membership.routes.js";
 import serviceRoutes from "./modules/services/routes/service.routes.js";
+import staffRoutes from "./modules/staff/routes/staff.routes.js";
 
 const app = express();
 
@@ -49,6 +50,11 @@ app.use(
 app.use(
   "/api/v1/organizations/:organizationId/services",
   serviceRoutes
+);
+
+app.use(
+  "/api/v1/organizations/:organizationId/staff",
+  staffRoutes
 );
 
 // Health check
