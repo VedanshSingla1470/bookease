@@ -4,6 +4,10 @@ import {
   fromZonedTime,
 } from "date-fns-tz";
 
+import {
+  queueBookingNotification,
+} from "../../notifications/services/notification.service.js";
+
 import Booking from "../models/booking.model.js";
 import BookingSlot from "../models/bookingSlot.model.js";
 
@@ -194,7 +198,7 @@ const getAvailableSlots = async ({
 
   const latest = new Date(
     Math.max(...availableCandidates) +
-      durationMs
+    durationMs
   );
 
   const occupiedSlots = await BookingSlot.find({
@@ -328,7 +332,7 @@ export const createBooking = async (
 
   const endAt = new Date(
     startAt.getTime() +
-      service.durationMinutes * 60 * 1000
+    service.durationMinutes * 60 * 1000
   );
 
   const localDate = formatInTimeZone(
@@ -410,11 +414,16 @@ export const createBooking = async (
 
       createdBooking = booking;
     });
-
-    return await Booking.findById(createdBooking._id)
+    const populatedBooking = await Booking.findById(createdBooking._id)
       .populate("customer", "firstName lastName email")
       .populate("staff")
       .populate("service");
+
+    void queueBookingNotification({
+      bookingId: populatedBooking._id,
+      type: "BOOKING_CONFIRMED",
+    });
+    return populatedBooking;
   } catch (error) {
     if (error.code === 11000) {
       throw new AppError(
@@ -427,6 +436,8 @@ export const createBooking = async (
   } finally {
     await session.endSession();
   }
+
+
 };
 
 export const getCustomerBookings = async (
@@ -567,6 +578,12 @@ export const cancelBooking = async (
       );
 
       cancelledBooking = booking;
+    });
+
+    void queueBookingNotification({
+      bookingId: booking._id,
+      type: "BOOKING_CANCELLED",
+      reason,
     });
 
     return cancelledBooking;

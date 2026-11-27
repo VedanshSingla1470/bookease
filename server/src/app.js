@@ -11,6 +11,7 @@ import serviceRoutes from "./modules/services/routes/service.routes.js";
 import staffRoutes from "./modules/staff/routes/staff.routes.js";
 import availabilityRoutes from "./modules/availability/routes/availability.routes.js";
 import bookingRoutes from "./modules/bookings/routes/booking.routes.js";
+import notificationRoutes from "./modules/notifications/routes/notification.routes.js";
 
 const app = express();
 
@@ -67,6 +68,11 @@ app.use(
 app.use(
   "/api/v1/organizations/:organizationId/bookings",
   bookingRoutes
+);
+
+app.use(
+  "/api/v1/organizations/:organizationId/notifications",
+  notificationRoutes
 );
 
 // Health check
