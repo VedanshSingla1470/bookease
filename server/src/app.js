@@ -9,6 +9,7 @@ import organizationRoutes from "./modules/organizations/routes/organization.rout
 import membershipRoutes from "./modules/memberships/routes/membership.routes.js";
 import serviceRoutes from "./modules/services/routes/service.routes.js";
 import staffRoutes from "./modules/staff/routes/staff.routes.js";
+import availabilityRoutes from "./modules/availability/routes/availability.routes.js";
 
 const app = express();
 
@@ -55,6 +56,11 @@ app.use(
 app.use(
   "/api/v1/organizations/:organizationId/staff",
   staffRoutes
+);
+
+app.use(
+  "/api/v1/organizations/:organizationId/staff/:staffId/availability",
+  availabilityRoutes
 );
 
 // Health check
